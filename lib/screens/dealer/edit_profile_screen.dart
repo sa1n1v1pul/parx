@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../controllers/profile_controller.dart';
 import '../../core/theme/app_colors.dart';
-import '../../widgets/glassmorphic_container.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -82,9 +81,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
+      backgroundColor: isDark ? null : const Color(0xFFF8FAFC),
       appBar: AppBar(
         title: const Text('Edit Profile'),
+        backgroundColor: isDark ? null : const Color(0xFFF8FAFC),
+        elevation: 0,
       ),
       body: Obx(() {
         final dealer = _profileController.dealer.value;
@@ -95,12 +98,22 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             child: Column(
               children: [
                 // Profile Picture
-                GlassmorphicContainer(
-                  padding: const EdgeInsets.all(24),
-                  margin: const EdgeInsets.only(bottom: 24),
-                  borderRadius: BorderRadius.circular(20),
-                  onTap: () => _profileController.pickImage(),
-                  child: Stack(
+                Material(
+                  color: isDark ? AppColors.cardBackgroundDark : Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  child: InkWell(
+                    onTap: () => _profileController.pickImage(),
+                    borderRadius: BorderRadius.circular(12),
+                    child: Container(
+                      padding: const EdgeInsets.all(24),
+                      margin: const EdgeInsets.only(bottom: 24),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: isDark ? AppColors.borderDark : const Color(0xFFE2E8F0),
+                        ),
+                      ),
+                      child: Stack(
                     children: [
                       CircleAvatar(
                         radius: 50,
@@ -151,15 +164,23 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         ),
                       ),
                     ],
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 24),
 
                 // Personal Information Section
-                GlassmorphicContainer(
+                Container(
                   padding: const EdgeInsets.all(20),
                   margin: const EdgeInsets.only(bottom: 24),
-                  borderRadius: BorderRadius.circular(20),
+                  decoration: BoxDecoration(
+                    color: isDark ? AppColors.cardBackgroundDark : Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: isDark ? AppColors.borderDark : const Color(0xFFE2E8F0),
+                    ),
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -216,10 +237,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ),
 
                 // Bank Details Section
-                GlassmorphicContainer(
+                Container(
                   padding: const EdgeInsets.all(20),
                   margin: const EdgeInsets.only(bottom: 24),
-                  borderRadius: BorderRadius.circular(20),
+                  decoration: BoxDecoration(
+                    color: isDark ? AppColors.cardBackgroundDark : Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: isDark ? AppColors.borderDark : const Color(0xFFE2E8F0),
+                    ),
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [

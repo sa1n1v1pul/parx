@@ -4,7 +4,6 @@ import '../../controllers/withdrawal_controller.dart';
 import '../../controllers/profile_controller.dart';
 import '../../controllers/wallet_controller.dart';
 import '../../core/theme/app_colors.dart';
-import '../../widgets/glassmorphic_container.dart';
 
 class WithdrawalScreen extends StatefulWidget {
   const WithdrawalScreen({super.key});
@@ -101,8 +100,15 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).brightness == Brightness.dark
+          ? null
+          : const Color(0xFFF8FAFC),
       appBar: AppBar(
         title: const Text('Withdrawal'),
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? null
+            : const Color(0xFFF8FAFC),
+        elevation: 0,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -113,40 +119,15 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
             Obx(() {
               final wallet = _walletController.wallet.value;
               final isDark = Theme.of(context).brightness == Brightness.dark;
-              return GlassmorphicContainer(
+              return Container(
                 padding: const EdgeInsets.all(20),
-                borderRadius: BorderRadius.circular(16),
-                gradient: isDark
-                    ? LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          AppColors.primaryBlue.withOpacity(0.28),
-                          AppColors.primaryPurple.withOpacity(0.24),
-                          AppColors.primaryBlue.withOpacity(0.2),
-                        ],
-                      )
-                    : AppColors.blueGradient,
-                borderColor: isDark
-                    ? Colors.white.withOpacity(0.25)
-                    : Colors.white.withOpacity(0.5),
-                borderWidth: 2,
-                boxShadow: isDark
-                    ? [
-                        BoxShadow(
-                          color: AppColors.primaryBlue.withOpacity(0.12),
-                          blurRadius: 12,
-                          offset: const Offset(0, 5),
-                          spreadRadius: 1,
-                        ),
-                        BoxShadow(
-                          color: AppColors.primaryPurple.withOpacity(0.1),
-                          blurRadius: 10,
-                          offset: const Offset(0, 2),
-                          spreadRadius: 0.5,
-                        ),
-                      ]
-                    : null,
+                decoration: BoxDecoration(
+                  color: isDark ? AppColors.cardBackgroundDark : Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: isDark ? AppColors.borderDark : const Color(0xFFE2E8F0),
+                  ),
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -156,23 +137,24 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
                         Text(
                           'Available Points',
                           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: AppColors.textLight.withOpacity(0.9),
+                                color: const Color(0xFF64748B),
                               ),
                         ),
                         const SizedBox(height: 8),
                         Text(
                           '${wallet?.balance ?? '0.00'} Points',
-                          style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                                color: AppColors.textLight,
-                                fontWeight: FontWeight.bold,
+                          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                fontWeight: FontWeight.w600,
                               ),
                         ),
                       ],
                     ),
-                    const Icon(
+                    Icon(
                       Icons.account_balance_wallet,
-                      size: 48,
-                      color: AppColors.textLight,
+                      size: 40,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? AppColors.textSecondaryDark
+                          : const Color(0xFF64748B),
                     ),
                   ],
                 ),
@@ -307,74 +289,49 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
     }
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return GlassmorphicContainer(
+    return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      borderRadius: BorderRadius.circular(20),
-      gradient: isDark
-          ? LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                AppColors.cardBackgroundDark.withOpacity(0.25),
-                AppColors.cardBackgroundDark.withOpacity(0.2),
-              ],
-            )
-          : LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.white.withOpacity(0.95),
-                Colors.white.withOpacity(0.9),
-              ],
-            ),
-      borderColor: isDark
-          ? Colors.white.withOpacity(0.2)
-          : statusColor.withOpacity(0.2),
-      borderWidth: 1.5,
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.cardBackgroundDark : Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isDark ? AppColors.borderDark : const Color(0xFFE2E8F0),
+        ),
+      ),
       child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         leading: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: statusColor.withOpacity(0.1),
+            color: statusColor.withOpacity(0.12),
             shape: BoxShape.circle,
           ),
-          child: Icon(
-            statusIcon,
-            color: isDark ? Colors.white : statusColor,
-          ),
+          child: Icon(statusIcon, color: statusColor, size: 22),
         ),
         title: Text(
           '${request.requestedAmount} Points',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: isDark ? Colors.white : null,
-          ),
+          style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
         ),
         subtitle: Text(
           _formatDate(request.requestDate),
-          style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight),
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: const Color(0xFF64748B),
+              ),
         ),
         trailing: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           decoration: BoxDecoration(
-            color: statusColor.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
+            color: statusColor.withOpacity(0.12),
+            borderRadius: BorderRadius.circular(8),
           ),
           child: Text(
             request.status.toUpperCase(),
             style: TextStyle(
-              color: isDark ? Colors.white : statusColor,
-              fontWeight: FontWeight.bold,
-              fontSize: 12,
-              shadows: isDark
-                  ? [
-                      Shadow(
-                        color: statusColor.withOpacity(0.8),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ]
-                  : null,
+              color: statusColor,
+              fontWeight: FontWeight.w600,
+              fontSize: 11,
             ),
           ),
         ),

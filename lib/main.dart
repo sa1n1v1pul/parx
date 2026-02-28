@@ -12,24 +12,15 @@ import 'controllers/theme_controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // Initialize GetStorage
+
   await GetStorage.init();
-  
-  // Initialize API Service
   ApiService().init();
-  
-  // Initialize Auth Controller
+
   Get.put(AuthController());
-  
-  // Initialize Theme Controller
   Get.put(ThemeController());
-  
-  // Set system UI overlay style for full screen
-  SystemChrome.setEnabledSystemUIMode(
-    SystemUiMode.edgeToEdge,
-  );
-  
+
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+
   runApp(const MyApp());
 }
 

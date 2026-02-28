@@ -4,7 +4,6 @@ import '../../controllers/wallet_controller.dart';
 import '../../core/theme/app_colors.dart';
 import '../../models/wallet_model.dart';
 import '../../widgets/empty_state_widget.dart';
-import '../../widgets/glassmorphic_container.dart';
 
 class TransactionsScreen extends StatelessWidget {
   const TransactionsScreen({super.key});
@@ -21,8 +20,15 @@ class TransactionsScreen extends StatelessWidget {
     });
 
     return Scaffold(
+      backgroundColor: Theme.of(context).brightness == Brightness.dark
+          ? null
+          : const Color(0xFFF8FAFC),
       appBar: AppBar(
         title: const Text('Transaction History'),
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? null
+            : const Color(0xFFF8FAFC),
+        elevation: 0,
       ),
       body: Obx(() {
         if (walletController.isLoading.value &&
@@ -59,65 +65,29 @@ class TransactionsScreen extends StatelessWidget {
     final icon = isCredit ? Icons.arrow_downward_rounded : Icons.arrow_upward_rounded;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return GlassmorphicContainer(
-      margin: const EdgeInsets.only(bottom: 16),
-      borderRadius: BorderRadius.circular(20),
-      gradient: isDark
-          ? LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                AppColors.cardBackgroundDark.withOpacity(0.3),
-                AppColors.cardBackgroundDark.withOpacity(0.25),
-                AppColors.cardBackgroundDark.withOpacity(0.2),
-              ],
-            )
-          : LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.white.withOpacity(0.95),
-                Colors.white.withOpacity(0.9),
-                Colors.white.withOpacity(0.85),
-              ],
-            ),
-      borderColor: isDark
-          ? Colors.white.withOpacity(0.2)
-          : color.withOpacity(0.2),
-      borderWidth: 1.5,
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.cardBackgroundDark : Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isDark ? AppColors.borderDark : const Color(0xFFE2E8F0),
+        ),
+      ),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         leading: Container(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            gradient: isCredit 
-                ? AppColors.successGradient 
-                : LinearGradient(
-                    colors: [AppColors.accentRed, AppColors.accentRed.withOpacity(0.7)],
-                  ),
+            color: color.withOpacity(0.12),
             shape: BoxShape.circle,
-            boxShadow: isDark
-                ? [
-                    BoxShadow(
-                      color: color.withOpacity(0.15),
-                      blurRadius: 6,
-                      offset: const Offset(0, 2),
-                    ),
-                  ]
-                : [
-                    BoxShadow(
-                      color: color.withOpacity(0.3),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
           ),
-          child: Icon(icon, color: Colors.white, size: 20),
+          child: Icon(icon, color: color, size: 20),
         ),
         title: Text(
           transaction.description,
           style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w600,
               ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
@@ -126,24 +96,17 @@ class TransactionsScreen extends StatelessWidget {
           padding: const EdgeInsets.only(top: 4),
           child: Text(
             _formatDate(transaction.createdAt),
-            style: Theme.of(context).textTheme.bodySmall,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: const Color(0xFF64748B),
+                ),
           ),
         ),
         trailing: Text(
           '${isCredit ? '+' : '-'}${transaction.amount} Points',
           style: TextStyle(
-            color: isDark ? Colors.white : color,
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-            shadows: isDark
-                ? [
-                    Shadow(
-                      color: color.withOpacity(0.8),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ]
-                : null,
+            color: color,
+            fontWeight: FontWeight.w600,
+            fontSize: 14,
           ),
         ),
       ),

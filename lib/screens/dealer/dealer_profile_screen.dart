@@ -4,7 +4,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../../controllers/auth_controller.dart';
 import '../../controllers/profile_controller.dart';
 import '../../core/theme/app_colors.dart';
-import '../../widgets/glassmorphic_container.dart';
 import '../wallet/wallet_screen.dart';
 import '../transactions/transactions_screen.dart';
 import '../withdrawal/withdrawal_screen.dart';
@@ -19,7 +18,16 @@ class DealerProfileScreen extends StatelessWidget {
     Get.put(ProfileController());
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Profile')),
+      backgroundColor: Theme.of(context).brightness == Brightness.dark
+          ? null
+          : const Color(0xFFF8FAFC),
+      appBar: AppBar(
+        title: const Text('Profile'),
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? null
+            : const Color(0xFFF8FAFC),
+        elevation: 0,
+      ),
       body: Obx(() {
         final dealer = authController.dealer.value;
         if (dealer == null) {
@@ -41,241 +49,55 @@ class DealerProfileScreen extends StatelessWidget {
           ),
           child: Column(
             children: [
-              // Profile Picture and Name - Premium Design
-              Builder(
-                builder: (context) {
-                  final isDark =
-                      Theme.of(context).brightness == Brightness.dark;
-                  return GlassmorphicContainer(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 32,
-                      horizontal: 24,
+              // Profile header
+              Container(
+                margin: const EdgeInsets.only(bottom: 20),
+                padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? AppColors.cardBackgroundDark
+                      : Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? AppColors.borderDark
+                        : const Color(0xFFE2E8F0),
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    CircleAvatar(
+                      radius: 48,
+                      backgroundColor: const Color(0xFF2563EB).withValues(alpha: 0.15),
+                      child: dealer.profilePic != null && dealer.profilePic!.isNotEmpty
+                          ? ClipOval(
+                              child: CachedNetworkImage(
+                                imageUrl: dealer.profilePic!,
+                                width: 96,
+                                height: 96,
+                                fit: BoxFit.cover,
+                                placeholder: (_, __) => const CircularProgressIndicator(strokeWidth: 2),
+                                errorWidget: (_, __, ___) => const Icon(Icons.person, size: 48, color: Color(0xFF2563EB)),
+                              ),
+                            )
+                          : const Icon(Icons.person, size: 48, color: Color(0xFF2563EB)),
                     ),
-                    margin: const EdgeInsets.only(bottom: 20),
-                    borderRadius: BorderRadius.circular(24),
-                    width: double.infinity,
-                    gradient: isDark
-                        ? LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              AppColors.primaryPurple.withOpacity(0.3),
-                              AppColors.primaryBlue.withOpacity(0.28),
-                              AppColors.primaryPurple.withOpacity(0.25),
-                              AppColors.primaryBlue.withOpacity(0.22),
-                            ],
-                          )
-                        : LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              AppColors.gradientStart.withOpacity(0.95),
-                              AppColors.gradientEnd.withOpacity(0.9),
-                              AppColors.gradientStart.withOpacity(0.85),
-                            ],
-                          ),
-                    borderColor: isDark
-                        ? Colors.white.withOpacity(0.3)
-                        : Colors.white.withOpacity(0.6),
-                    borderWidth: 2.5,
-                    boxShadow: isDark
-                        ? [
-                            BoxShadow(
-                              color: AppColors.primaryPurple.withOpacity(0.15),
-                              blurRadius: 15,
-                              offset: const Offset(0, 6),
-                              spreadRadius: 1,
-                            ),
-                            BoxShadow(
-                              color: AppColors.primaryBlue.withOpacity(0.12),
-                              blurRadius: 12,
-                              offset: const Offset(0, 3),
-                              spreadRadius: 0.5,
-                            ),
-                          ]
-                        : [
-                            BoxShadow(
-                              color: AppColors.primaryPurple.withOpacity(0.3),
-                              blurRadius: 30,
-                              offset: const Offset(0, 12),
-                              spreadRadius: 3,
-                            ),
-                            BoxShadow(
-                              color: AppColors.primaryBlue.withOpacity(0.25),
-                              blurRadius: 25,
-                              offset: const Offset(0, 6),
-                              spreadRadius: 2,
-                            ),
-                          ],
-                    child: Column(
-                      children: [
-                        // Profile Picture with Border
-                        Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            gradient: LinearGradient(
-                              colors: isDark
-                                  ? [
-                                      Colors.white.withOpacity(0.3),
-                                      Colors.white.withOpacity(0.2),
-                                    ]
-                                  : [
-                                      Colors.white,
-                                      Colors.white.withOpacity(0.95),
-                                    ],
-                            ),
-                            border: Border.all(
-                              color: isDark
-                                  ? Colors.white.withOpacity(0.4)
-                                  : Colors.white,
-                              width: 4,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: isDark
-                                    ? AppColors.primaryPurple.withOpacity(0.2)
-                                    : AppColors.primaryPurple.withOpacity(0.4),
-                                blurRadius: isDark ? 12 : 20,
-                                offset: const Offset(0, 8),
-                                spreadRadius: isDark ? 0.5 : 2,
-                              ),
-                              BoxShadow(
-                                color: isDark
-                                    ? AppColors.primaryBlue.withOpacity(0.15)
-                                    : AppColors.primaryBlue.withOpacity(0.3),
-                                blurRadius: isDark ? 10 : 15,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: CircleAvatar(
-                            radius: 60,
-                            backgroundColor: Colors.transparent,
-                            child:
-                                dealer.profilePic != null &&
-                                    dealer.profilePic!.isNotEmpty
-                                ? ClipOval(
-                                    child: CachedNetworkImage(
-                                      imageUrl: dealer.profilePic!,
-                                      width: 120,
-                                      height: 120,
-                                      fit: BoxFit.cover,
-                                      placeholder: (context, url) =>
-                                          const CircularProgressIndicator(
-                                            strokeWidth: 3,
-                                            color: AppColors.primaryBlue,
-                                          ),
-                                      errorWidget: (context, url, error) =>
-                                          Container(
-                                            decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              gradient: LinearGradient(
-                                                colors: [
-                                                  AppColors.primaryPurple
-                                                      .withOpacity(0.3),
-                                                  AppColors.primaryBlue
-                                                      .withOpacity(0.3),
-                                                ],
-                                              ),
-                                            ),
-                                            child: const Icon(
-                                              Icons.person,
-                                              size: 60,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                    ),
-                                  )
-                                : Container(
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          AppColors.primaryPurple.withOpacity(
-                                            0.3,
-                                          ),
-                                          AppColors.primaryBlue.withOpacity(
-                                            0.3,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    child: const Icon(
-                                      Icons.person,
-                                      size: 60,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-                        Text(
-                          dealer.name,
-                          style: Theme.of(context).textTheme.headlineLarge
-                              ?.copyWith(
-                                color: AppColors.textLight,
-                                fontWeight: FontWeight.bold,
-                                shadows: [
-                                  Shadow(
-                                    color: Colors.black.withOpacity(0.3),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
-                              ),
-                        ),
-                        const SizedBox(height: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
-                              color: Colors.white.withOpacity(0.3),
-                              width: 1,
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.email_outlined,
-                                size: 16,
-                                color: Colors.white.withOpacity(0.9),
-                              ),
-                              const SizedBox(width: 8),
-                              Flexible(
-                                child: Text(
-                                  dealer.email,
-                                  style: Theme.of(context).textTheme.bodyMedium
-                                      ?.copyWith(
-                                        color: AppColors.textLight.withOpacity(
-                                          0.95,
-                                        ),
-                                        shadows: [
-                                          Shadow(
-                                            color: Colors.black.withOpacity(
-                                              0.2,
-                                            ),
-                                            blurRadius: 8,
-                                            offset: const Offset(0, 2),
-                                          ),
-                                        ],
-                                      ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+                    const SizedBox(height: 16),
+                    Text(
+                      dealer.name,
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
+                      textAlign: TextAlign.center,
                     ),
-                  );
-                },
+                    const SizedBox(height: 4),
+                    Text(
+                      dealer.email,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: const Color(0xFF64748B)),
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
               ),
 
               // Profile Details
@@ -329,119 +151,38 @@ class DealerProfileScreen extends StatelessWidget {
     required List<Widget> children,
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return GlassmorphicContainer(
-      margin: const EdgeInsets.only(bottom: 20),
-      padding: const EdgeInsets.all(20.0),
-      borderRadius: BorderRadius.circular(24),
-      width: double.infinity,
-      gradient: isDark
-          ? LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                AppColors.cardBackgroundDark.withOpacity(0.28),
-                AppColors.cardBackgroundDark.withOpacity(0.24),
-                AppColors.cardBackgroundDark.withOpacity(0.2),
-                AppColors.cardBackgroundDark.withOpacity(0.18),
-              ],
-            )
-          : LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.white.withOpacity(0.98),
-                Colors.white.withOpacity(0.95),
-                Colors.white.withOpacity(0.92),
-                Colors.white.withOpacity(0.9),
-              ],
-            ),
-      borderColor: isDark
-          ? Colors.white.withOpacity(0.25)
-          : AppColors.primaryBlue.withOpacity(0.3),
-      borderWidth: 2,
-      boxShadow: isDark
-          ? [
-              BoxShadow(
-                color: AppColors.primaryPurple.withOpacity(0.12),
-                blurRadius: 12,
-                offset: const Offset(0, 5),
-                spreadRadius: 1,
-              ),
-              BoxShadow(
-                color: AppColors.primaryBlue.withOpacity(0.1),
-                blurRadius: 10,
-                offset: const Offset(0, 2),
-                spreadRadius: 0.5,
-              ),
-            ]
-          : [
-              BoxShadow(
-                color: AppColors.primaryPurple.withOpacity(0.2),
-                blurRadius: 25,
-                offset: const Offset(0, 10),
-                spreadRadius: 2,
-              ),
-              BoxShadow(
-                color: AppColors.primaryBlue.withOpacity(0.15),
-                blurRadius: 20,
-                offset: const Offset(0, 5),
-              ),
-            ],
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.cardBackgroundDark : Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isDark ? AppColors.borderDark : const Color(0xFFE2E8F0),
+        ),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            padding: const EdgeInsets.only(bottom: 16),
-            decoration: BoxDecoration(
-              border: Border(
-                bottom: BorderSide(
-                  color: isDark
-                      ? Colors.white.withOpacity(0.2)
-                      : AppColors.primaryBlue.withOpacity(0.2),
-                  width: 1.5,
+          Row(
+            children: [
+              Icon(
+                title == 'Personal Information'
+                    ? Icons.person_outline_rounded
+                    : Icons.account_balance_outlined,
+                color: const Color(0xFF2563EB),
+                size: 22,
+              ),
+              const SizedBox(width: 10),
+              Text(
+                title,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
                 ),
               ),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    gradient: isDark
-                        ? LinearGradient(
-                            colors: [
-                              AppColors.primaryPurple.withOpacity(0.3),
-                              AppColors.primaryBlue.withOpacity(0.3),
-                            ],
-                          )
-                        : LinearGradient(
-                            colors: [
-                              AppColors.primaryPurple.withOpacity(0.15),
-                              AppColors.primaryBlue.withOpacity(0.15),
-                            ],
-                          ),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(
-                    title == 'Personal Information'
-                        ? Icons.person_outline
-                        : Icons.account_balance_outlined,
-                    color: isDark ? Colors.white : AppColors.primaryBlue,
-                    size: 20,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  title,
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : null,
-                  ),
-                ),
-              ],
-            ),
+            ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
           ...children,
         ],
       ),
@@ -449,62 +190,26 @@ class DealerProfileScreen extends StatelessWidget {
   }
 
   Widget _buildInfoRow(BuildContext context, String label, String value) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: isDark
-            ? LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Colors.white.withOpacity(0.08),
-                  Colors.white.withOpacity(0.05),
-                  Colors.white.withOpacity(0.03),
-                ],
-              )
-            : LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  AppColors.primaryBlue.withOpacity(0.08),
-                  AppColors.primaryPurple.withOpacity(0.05),
-                  Colors.transparent,
-                ],
-              ),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isDark
-              ? Colors.white.withOpacity(0.1)
-              : AppColors.primaryBlue.withOpacity(0.15),
-          width: 1,
-        ),
-      ),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 100,
-            padding: const EdgeInsets.only(right: 12),
+          SizedBox(
+            width: 110,
             child: Text(
               label,
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 13,
-                color: isDark
-                    ? AppColors.textSecondaryDark.withOpacity(0.9)
-                    : AppColors.textSecondaryLight,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: const Color(0xFF64748B),
+                fontWeight: FontWeight.w500,
               ),
             ),
           ),
           Expanded(
             child: Text(
               value,
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 14,
-                color: isDark ? Colors.white : AppColors.textPrimaryLight,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w500,
               ),
             ),
           ),
@@ -519,33 +224,16 @@ class DealerProfileScreen extends StatelessWidget {
   ) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return GlassmorphicContainer(
+    return Container(
       padding: const EdgeInsets.all(16),
       margin: const EdgeInsets.only(bottom: 8),
-      borderRadius: BorderRadius.circular(24),
-      gradient: isDark
-          ? LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                AppColors.cardBackgroundDark.withOpacity(0.25),
-                AppColors.cardBackgroundDark.withOpacity(0.2),
-                AppColors.cardBackgroundDark.withOpacity(0.15),
-              ],
-            )
-          : LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.white.withOpacity(0.95),
-                Colors.white.withOpacity(0.92),
-                Colors.white.withOpacity(0.9),
-              ],
-            ),
-      borderColor: isDark
-          ? Colors.white.withOpacity(0.18)
-          : AppColors.primaryBlue.withOpacity(0.25),
-      borderWidth: 1.5,
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.cardBackgroundDark : Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isDark ? AppColors.borderDark : const Color(0xFFE2E8F0),
+        ),
+      ),
       child: Column(
         children: [
           _buildPremiumMenuOption(
@@ -610,102 +298,53 @@ class DealerProfileScreen extends StatelessWidget {
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return GlassmorphicContainer(
-      padding: const EdgeInsets.all(16),
-      borderRadius: BorderRadius.circular(18),
-      onTap: onTap,
-      gradient: isDark
-          ? LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                color.withOpacity(0.2),
-                color.withOpacity(0.15),
-                color.withOpacity(0.1),
-              ],
-            )
-          : LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.white.withOpacity(0.98),
-                Colors.white.withOpacity(0.95),
-                Colors.white.withOpacity(0.92),
-              ],
-            ),
-      borderColor: isDark ? color.withOpacity(0.3) : color.withOpacity(0.25),
-      borderWidth: 1.5,
-      boxShadow: isDark
-          ? [
-              BoxShadow(
-                color: color.withOpacity(0.1),
-                blurRadius: 8,
-                offset: const Offset(0, 3),
-                spreadRadius: 0.5,
+    return Material(
+      color: isDark ? AppColors.backgroundDark : const Color(0xFFF8FAFC),
+      borderRadius: BorderRadius.circular(10),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(10),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(icon, color: color, size: 22),
               ),
-            ]
-          : [
-              BoxShadow(
-                color: color.withOpacity(0.2),
-                blurRadius: 15,
-                offset: const Offset(0, 6),
-                spreadRadius: 1,
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: const Color(0xFF64748B),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(
+                Icons.arrow_forward_ios_rounded,
+                size: 14,
+                color: Color(0xFF94A3B8),
               ),
             ],
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  color.withOpacity(isDark ? 0.4 : 0.2),
-                  color.withOpacity(isDark ? 0.3 : 0.15),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(14),
-              boxShadow: [
-                BoxShadow(
-                  color: color.withOpacity(0.3),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Icon(icon, color: isDark ? Colors.white : color, size: 24),
           ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : null,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  subtitle,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: isDark
-                        ? Colors.white.withOpacity(0.7)
-                        : AppColors.textSecondaryLight,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Icon(
-            Icons.arrow_forward_ios_rounded,
-            size: 18,
-            color: isDark
-                ? Colors.white.withOpacity(0.6)
-                : AppColors.textSecondaryLight,
-          ),
-        ],
+        ),
       ),
     );
   }

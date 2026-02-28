@@ -16,6 +16,7 @@ class AppConstants {
   static const String profileEndpoint = '/api/dealer/profile';
   static const String profileUpdateEndpoint = '/api/dealer/profile/update';
   static const String productsEndpoint = '/api/dealer/products';
+  static const String catalogsEndpoint = '/api/catalogs_data';
 
   // Storage Keys
   static const String tokenKey = 'auth_token';

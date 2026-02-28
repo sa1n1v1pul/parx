@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import '../../controllers/wallet_controller.dart';
 import '../../core/theme/app_colors.dart';
 import '../../widgets/empty_state_widget.dart';
-import '../../widgets/glassmorphic_container.dart';
 import '../transactions/transactions_screen.dart';
 
 class WalletScreen extends StatelessWidget {
@@ -14,8 +13,15 @@ class WalletScreen extends StatelessWidget {
     final WalletController walletController = Get.find<WalletController>();
 
     return Scaffold(
+      backgroundColor: Theme.of(context).brightness == Brightness.dark
+          ? null
+          : const Color(0xFFF8FAFC),
       appBar: AppBar(
         title: const Text('Wallet'),
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? null
+            : const Color(0xFFF8FAFC),
+        elevation: 0,
       ),
       body: RefreshIndicator(
         onRefresh: () {
@@ -42,63 +48,34 @@ class WalletScreen extends StatelessWidget {
             child: Column(
               children: [
                 // Wallet Balance Card
-                GlassmorphicContainer(
-                  padding: const EdgeInsets.all(32),
-                  margin: const EdgeInsets.only(bottom: 24),
-                  borderRadius: BorderRadius.circular(24),
+                Container(
+                  padding: const EdgeInsets.all(24),
+                  margin: const EdgeInsets.only(bottom: 20),
                   width: double.infinity,
-                  gradient: Theme.of(context).brightness == Brightness.dark
-                      ? LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            AppColors.primaryPurple.withOpacity(0.28),
-                            AppColors.primaryBlue.withOpacity(0.24),
-                            AppColors.primaryPurple.withOpacity(0.2),
-                          ],
-                        )
-                      : LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            AppColors.gradientStart.withOpacity(0.9),
-                            AppColors.gradientEnd.withOpacity(0.85),
-                          ],
-                        ),
-                  borderColor: Theme.of(context).brightness == Brightness.dark
-                      ? Colors.white.withOpacity(0.25)
-                      : Colors.white.withOpacity(0.5),
-                  borderWidth: 2,
-                  boxShadow: Theme.of(context).brightness == Brightness.dark
-                      ? [
-                          BoxShadow(
-                            color: AppColors.primaryPurple.withOpacity(0.12),
-                            blurRadius: 12,
-                            offset: const Offset(0, 5),
-                            spreadRadius: 1,
-                          ),
-                          BoxShadow(
-                            color: AppColors.primaryBlue.withOpacity(0.1),
-                            blurRadius: 10,
-                            offset: const Offset(0, 2),
-                            spreadRadius: 0.5,
-                          ),
-                        ]
-                      : null,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? AppColors.cardBackgroundDark
+                        : Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? AppColors.borderDark
+                          : const Color(0xFFE2E8F0),
+                    ),
+                  ),
                   child: Column(
                     children: [
                       Text(
                         'Current Points',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: AppColors.textLight.withOpacity(0.9),
+                              color: const Color(0xFF64748B),
                             ),
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 8),
                       Text(
                         '${wallet.balance} Points',
-                        style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                              color: AppColors.textLight,
-                              fontWeight: FontWeight.bold,
+                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
                             ),
                       ),
                     ],
@@ -164,87 +141,39 @@ class WalletScreen extends StatelessWidget {
     required IconData icon,
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
-    return GlassmorphicContainer(
-      padding: const EdgeInsets.all(20),
-      borderRadius: BorderRadius.circular(20),
-      gradient: isDark
-          ? LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                color.withOpacity(0.3),
-                color.withOpacity(0.25),
-                color.withOpacity(0.2),
-              ],
-            )
-          : LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.white.withOpacity(0.95),
-                Colors.white.withOpacity(0.9),
-                Colors.white.withOpacity(0.85),
-              ],
-            ),
-      borderColor: color.withOpacity(isDark ? 0.4 : 0.3),
-      borderWidth: 1.5,
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.cardBackgroundDark : Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isDark ? AppColors.borderDark : const Color(0xFFE2E8F0),
+        ),
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: isDark
-                  ? color.withOpacity(0.35)
-                  : color.withOpacity(0.15),
-              shape: BoxShape.circle,
-              boxShadow: isDark
-                  ? [
-                      BoxShadow(
-                        color: color.withOpacity(0.15),
-                        blurRadius: 8,
-                        offset: const Offset(0, 3),
-                        spreadRadius: 0.5,
-                      ),
-                    ]
-                  : null,
-            ),
-            child: Icon(
-              icon,
-              color: isDark ? Colors.white : color,
-              size: 28,
-            ),
-          ),
-          const SizedBox(height: 12),
+          Icon(icon, color: color, size: 28),
+          const SizedBox(height: 10),
           Text(
             title,
-            style: Theme.of(context).textTheme.bodySmall,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: const Color(0xFF64748B),
+            ),
             textAlign: TextAlign.center,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
-          const SizedBox(height: 6),
-          Flexible(
-            child: Text(
-              value,
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    color: isDark ? Colors.white : color,
-                    fontWeight: FontWeight.bold,
-                    shadows: isDark
-                        ? [
-                            Shadow(
-                              color: color.withOpacity(0.8),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
-                            ),
-                          ]
-                        : null,
-                  ),
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.w600,
             ),
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),

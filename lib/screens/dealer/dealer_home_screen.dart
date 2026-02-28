@@ -7,11 +7,13 @@ import '../../controllers/theme_controller.dart';
 import '../../core/theme/app_colors.dart';
 import '../../widgets/custom_bottom_nav_bar.dart';
 import '../../widgets/empty_state_widget.dart';
-import '../../widgets/glassmorphic_container.dart';
 import 'dealer_profile_screen.dart';
 import '../wallet/wallet_screen.dart';
 import '../transactions/transactions_screen.dart';
 import '../withdrawal/withdrawal_screen.dart';
+import '../catalog/catalogs_view_all_screen.dart';
+import '../catalog/catalog_detail_screen.dart';
+import '../../controllers/catalog_controller.dart';
 
 class DealerHomeScreen extends StatefulWidget {
   const DealerHomeScreen({super.key});
@@ -30,6 +32,7 @@ class _DealerHomeScreenState extends State<DealerHomeScreen> {
     super.initState();
     _walletController.fetchWallet();
     _productController.fetchProducts();
+    Get.put(CatalogController()).fetchCatalogs();
   }
 
   @override
@@ -69,8 +72,15 @@ class HomeTab extends StatelessWidget {
     final themeController = Get.find<ThemeController>();
 
     return Scaffold(
+      backgroundColor: Theme.of(context).brightness == Brightness.dark
+          ? null
+          : const Color(0xFFF8FAFC),
       appBar: AppBar(
         title: const Text('Parx Hardware'),
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? null
+            : const Color(0xFFF8FAFC),
+        elevation: 0,
         actions: [
           Obx(
             () => IconButton(
@@ -87,6 +97,7 @@ class HomeTab extends StatelessWidget {
           onRefresh: () async {
             walletController.refreshWallet();
             productController.refreshProducts();
+            Get.find<CatalogController>().refreshCatalogs();
           },
           child: Builder(
             builder: (context) {
@@ -104,64 +115,54 @@ class HomeTab extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Welcome Section
+                    // Welcome + wallet section
                     Obx(() {
                       final isDark =
                           Theme.of(context).brightness == Brightness.dark;
-                      return GlassmorphicContainer(
-                        padding: const EdgeInsets.all(20),
-                        margin: const EdgeInsets.only(bottom: 16),
-                        borderRadius: BorderRadius.circular(20),
-                        gradient: isDark
-                            ? LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [
-                                  AppColors.primaryPurple.withOpacity(0.28),
-                                  AppColors.primaryBlue.withOpacity(0.24),
-                                  AppColors.primaryPurple.withOpacity(0.2),
-                                ],
-                              )
-                            : LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [
-                                  AppColors.gradientStart.withOpacity(0.9),
-                                  AppColors.gradientEnd.withOpacity(0.85),
-                                ],
-                              ),
-                        borderColor: isDark
-                            ? Colors.white.withOpacity(0.25)
-                            : Colors.white.withOpacity(0.5),
-                        borderWidth: 2,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Welcome, ${authController.dealer.value?.name ?? 'Dealer'}!',
-                              style: Theme.of(context).textTheme.headlineMedium
-                                  ?.copyWith(
-                                    color: AppColors.textLight,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Container(
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: isDark
+                                ? AppColors.cardBackgroundDark
+                                : Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: isDark
+                                  ? AppColors.borderDark
+                                  : const Color(0xFFE2E8F0),
                             ),
-                            const SizedBox(height: 16),
-                            // Wallet Balance Card
-                            Obx(
-                              () => _buildWalletCard(
-                                context,
-                                balance:
-                                    walletController.wallet.value?.balance ??
-                                    '0.00',
-                                totalEarned:
-                                    walletController
-                                        .wallet
-                                        .value
-                                        ?.totalEarned ??
-                                    '0.00',
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Welcome, ${authController.dealer.value?.name ?? 'Partner'}!',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleLarge
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.w600,
+                                    ),
                               ),
-                            ),
-                          ],
+                              const SizedBox(height: 16),
+                              Obx(
+                                () => _buildWalletCard(
+                                  context,
+                                  balance:
+                                      walletController.wallet.value?.balance ??
+                                      '0.00',
+                                  totalEarned:
+                                      walletController
+                                          .wallet
+                                          .value
+                                          ?.totalEarned ??
+                                      '0.00',
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       );
                     }),
@@ -205,6 +206,60 @@ class HomeTab extends StatelessWidget {
                         ],
                       ),
                     ),
+
+                    // Catalogs section (for partner)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Catalogs',
+                            style: Theme.of(context).textTheme.headlineMedium,
+                          ),
+                          TextButton(
+                            onPressed: () =>
+                                Get.to(() => const CatalogsViewAllScreen()),
+                            child: const Text('View All'),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Obx(() {
+                      final catalogController = Get.find<CatalogController>();
+                      if (catalogController.isLoading.value &&
+                          catalogController.catalogs.isEmpty) {
+                        return const SizedBox(
+                          height: 80,
+                          child: Center(child: CircularProgressIndicator()),
+                        );
+                      }
+                      if (catalogController.catalogs.isEmpty) {
+                        return const SizedBox.shrink();
+                      }
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: catalogController.catalogs
+                                .take(5)
+                                .map((c) => Padding(
+                                      padding: const EdgeInsets.only(right: 12),
+                                      child: _CatalogChip(
+                                        title: c.title,
+                                        imageUrl: c.image,
+                                        onTap: () => Get.to(() =>
+                                            CatalogDetailScreen(catalog: c)),
+                                      ),
+                                    ))
+                                .toList(),
+                          ),
+                        ),
+                      );
+                    }),
+                    const SizedBox(height: 24),
 
                     // Products Catalog
                     Padding(
@@ -272,114 +327,61 @@ class HomeTab extends StatelessWidget {
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return GlassmorphicContainer(
-      padding: const EdgeInsets.all(24),
-      borderRadius: BorderRadius.circular(20),
-      gradient: isDark
-          ? LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                AppColors.primaryPurple.withOpacity(0.28),
-                AppColors.primaryBlue.withOpacity(0.24),
-                AppColors.primaryPurple.withOpacity(0.2),
-              ],
-            )
-          : LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                AppColors.gradientStart.withOpacity(0.85),
-                AppColors.gradientEnd.withOpacity(0.8),
-              ],
-            ),
-      borderColor: isDark
-          ? Colors.white.withOpacity(0.25)
-          : Colors.white.withOpacity(0.5),
-      borderWidth: 2,
-      boxShadow: isDark
-          ? [
-              BoxShadow(
-                color: AppColors.primaryPurple.withOpacity(0.12),
-                blurRadius: 12,
-                offset: const Offset(0, 5),
-                spreadRadius: 1,
-              ),
-              BoxShadow(
-                color: AppColors.primaryBlue.withOpacity(0.1),
-                blurRadius: 10,
-                offset: const Offset(0, 2),
-                spreadRadius: 0.5,
-              ),
-            ]
-          : [
-              BoxShadow(
-                color: AppColors.primaryPurple.withOpacity(0.25),
-                blurRadius: 25,
-                offset: const Offset(0, 10),
-                spreadRadius: 2,
-              ),
-              BoxShadow(
-                color: AppColors.primaryBlue.withOpacity(0.2),
-                blurRadius: 20,
-                offset: const Offset(0, 5),
-              ),
-              BoxShadow(
-                color: Colors.black.withOpacity(0.15),
-                blurRadius: 15,
-                offset: const Offset(0, -3),
-              ),
-            ],
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: isDark
+            ? AppColors.backgroundDark
+            : const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: isDark ? AppColors.borderDark : const Color(0xFFE2E8F0),
+        ),
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Flexible(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Wallet Points',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.textLight.withOpacity(0.9),
-                  ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Wallet Points',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: const Color(0xFF64748B),
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  '${_removeDecimals(balance)} Points',
-                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    color: AppColors.textLight,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                '${_removeDecimals(balance)} Points',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w600,
                 ),
-              ],
-            ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
           ),
-          Flexible(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Total Earned',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.textLight.withOpacity(0.9),
-                  ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Total Earned',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: const Color(0xFF64748B),
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  '${_removeDecimals(totalEarned)} Points',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: AppColors.textLight,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                '${_removeDecimals(totalEarned)} Points',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
                 ),
-              ],
-            ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
           ),
         ],
       ),
@@ -394,119 +396,35 @@ class HomeTab extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final textScale = MediaQuery.of(context).textScaleFactor.clamp(0.8, 1.2);
 
-    return GlassmorphicContainer(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
-      padding: EdgeInsets.symmetric(
-        vertical: screenWidth * 0.04,
-        horizontal: screenWidth * 0.03,
-      ),
-      gradient: isDark
-          ? LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                color.withOpacity(0.28),
-                color.withOpacity(0.24),
-                color.withOpacity(0.2),
-              ],
-            )
-          : LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.white.withOpacity(0.95),
-                Colors.white.withOpacity(0.85),
-                Colors.white.withOpacity(0.9),
-              ],
+    return Material(
+      color: isDark ? AppColors.cardBackgroundDark : Colors.white,
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isDark ? AppColors.borderDark : const Color(0xFFE2E8F0),
             ),
-      borderColor: color.withOpacity(
-        isDark ? 0.5 : 0.4,
-      ), // Brighter border in dark mode
-      borderWidth: 2,
-      boxShadow: [
-        BoxShadow(
-          color: color.withOpacity(0.3),
-          blurRadius: 20,
-          offset: const Offset(0, 8),
-          spreadRadius: 2,
-        ),
-        BoxShadow(
-          color: color.withOpacity(0.15),
-          blurRadius: 15,
-          offset: const Offset(0, 4),
-        ),
-      ],
-      child: Container(
-        constraints: BoxConstraints(minHeight: 100, maxHeight: 120),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(16),
+          ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Flexible(
-                flex: 2,
-                child: Container(
-                  padding: EdgeInsets.all(screenWidth * 0.03),
-                  decoration: BoxDecoration(
-                    color: isDark
-                        ? color.withOpacity(0.35) // Brighter in dark mode
-                        : color.withOpacity(0.15),
-                    shape: BoxShape.circle,
-                    boxShadow: isDark
-                        ? [
-                            BoxShadow(
-                              color: color.withOpacity(0.15),
-                              blurRadius: 8,
-                              offset: const Offset(0, 3),
-                              spreadRadius: 0.5,
-                            ),
-                          ]
-                        : null,
-                  ),
-                  child: Icon(
-                    icon,
-                    color: isDark
-                        ? Colors
-                              .white // Bright white icons in dark mode
-                        : color,
-                    size: (screenWidth * 0.07).clamp(24.0, 32.0),
-                  ),
+              Icon(icon, color: color, size: 28),
+              const SizedBox(height: 8),
+              Text(
+                title,
+                style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
                 ),
-              ),
-              SizedBox(height: screenWidth * 0.025),
-              Flexible(
-                flex: 1,
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Text(
-                    title,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: isDark
-                          ? Colors
-                                .white // Bright white text in dark mode
-                          : color,
-                      fontWeight: FontWeight.bold,
-                      fontSize: (12 / textScale).clamp(10.0, 14.0),
-                      shadows: isDark
-                          ? [
-                              Shadow(
-                                color: color.withOpacity(0.8),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
-                              ),
-                            ]
-                          : null,
-                    ),
-                    textAlign: TextAlign.center,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
@@ -518,49 +436,30 @@ class HomeTab extends StatelessWidget {
   Widget _buildProductCard(BuildContext context, product) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return GlassmorphicContainer(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16.0),
-      borderRadius: BorderRadius.circular(20),
-      gradient: isDark
-          ? LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                AppColors.cardBackgroundDark.withOpacity(0.25),
-                AppColors.cardBackgroundDark.withOpacity(0.2),
-                AppColors.cardBackgroundDark.withOpacity(0.15),
-              ],
-            )
-          : LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.white.withOpacity(0.95),
-                Colors.white.withOpacity(0.9),
-                Colors.white.withOpacity(0.85),
-              ],
-            ),
-      borderColor: isDark
-          ? Colors.white.withOpacity(0.2)
-          : AppColors.primaryBlue.withOpacity(0.2),
-      borderWidth: 1.5,
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.cardBackgroundDark : Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isDark ? AppColors.borderDark : const Color(0xFFE2E8F0),
+        ),
+      ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Product Image
           Container(
-            width: 90,
-            height: 90,
+            width: 80,
+            height: 80,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              color: isDark
-                  ? AppColors.backgroundDark
-                  : AppColors.backgroundLight,
+              borderRadius: BorderRadius.circular(10),
+              color: const Color(0xFFF1F5F9),
             ),
             child: product.images.isNotEmpty
                 ? ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(10),
                     child: Image.network(
                       product.images[0],
                       fit: BoxFit.cover,
@@ -626,14 +525,14 @@ class HomeTab extends StatelessWidget {
                         vertical: 6,
                       ),
                       decoration: BoxDecoration(
-                        gradient: AppColors.successGradient,
-                        borderRadius: BorderRadius.circular(12),
+                        color: AppColors.accentGreen,
+                        borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
                         '${product.rewardPoints} pts',
                         style: const TextStyle(
                           color: Colors.white,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                           fontSize: 11,
                         ),
                       ),
@@ -644,6 +543,72 @@ class HomeTab extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _CatalogChip extends StatelessWidget {
+  final String title;
+  final String? imageUrl;
+  final VoidCallback onTap;
+
+  const _CatalogChip({
+    required this.title,
+    this.imageUrl,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: SizedBox(
+                width: 100,
+                height: 70,
+                child: imageUrl != null && imageUrl!.isNotEmpty
+                    ? Image.network(
+                        imageUrl!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => Icon(
+                          Icons.collections_bookmark_outlined,
+                          size: 32,
+                          color: isDark
+                              ? AppColors.textSecondaryDark
+                              : AppColors.textSecondaryLight,
+                        ),
+                      )
+                    : Icon(
+                        Icons.collections_bookmark_outlined,
+                        size: 32,
+                        color: isDark
+                            ? AppColors.textSecondaryDark
+                            : AppColors.textSecondaryLight,
+                      ),
+              ),
+            ),
+            const SizedBox(height: 4),
+            SizedBox(
+              width: 100,
+              child: Text(
+                title,
+                style: Theme.of(context).textTheme.labelSmall,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

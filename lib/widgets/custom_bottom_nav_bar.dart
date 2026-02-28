@@ -22,17 +22,17 @@ class CustomBottomNavBar extends StatelessWidget {
 
     return Container(
       margin: EdgeInsets.only(
-        left: 12,
-        right: 12,
-        top: 12,
-        bottom: bottomPadding > 0 ? bottomPadding + 12 : 12,
+        left: 16,
+        right: 16,
+        top: 8,
+        bottom: bottomPadding > 0 ? bottomPadding + 8 : 8,
       ),
       decoration: BoxDecoration(
-        color: isDark
-            ? AppColors.cardBackgroundDark
-            : AppColors.cardBackgroundLight,
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: AppColors.shadow3D,
+        color: isDark ? AppColors.cardBackgroundDark : Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isDark ? AppColors.borderDark : const Color(0xFFE2E8F0),
+        ),
       ),
       child: IntrinsicHeight(
         child: Padding(
@@ -84,21 +84,8 @@ class CustomBottomNavBar extends StatelessWidget {
           width: buttonSize,
           height: buttonSize,
           decoration: BoxDecoration(
-            gradient: AppColors.primaryGradient,
+            color: const Color(0xFF2563EB),
             shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.primaryPurple.withOpacity(0.4),
-                blurRadius: 20,
-                offset: const Offset(0, 8),
-                spreadRadius: 2,
-              ),
-              BoxShadow(
-                color: AppColors.primaryBlue.withOpacity(0.3),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
           ),
           child: Icon(
             Icons.qr_code_scanner_rounded,

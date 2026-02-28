@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../core/theme/app_colors.dart';
-import '../widgets/glassmorphic_container.dart';
 import 'dealer/dealer_login_screen.dart';
 import 'user/user_qr_scanner_screen.dart';
 
@@ -11,59 +10,78 @@ class UserTypeSelectionScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: AppColors.primaryGradient,
-        ),
-        child: SafeArea(
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // App Logo/Title
-                  Text(
-                    'Parx Hardware',
-                    style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                          color: AppColors.textLight,
-                          fontWeight: FontWeight.bold,
-                        ),
+      backgroundColor: const Color(0xFFF8FAFC),
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const SizedBox(height: 24),
+                // Logo
+                Container(
+                  width: 88,
+                  height: 88,
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryBlue,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primaryBlue.withValues(alpha: 0.35),
+                        blurRadius: 20,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Choose your role',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: AppColors.textLight.withOpacity(0.9),
-                        ),
+                  child: const Icon(
+                    Icons.storefront_rounded,
+                    size: 44,
+                    color: Colors.white,
                   ),
-                  const SizedBox(height: 80),
-                  
-                  // I am User Button
-                  _buildTypeButton(
-                    context,
-                    title: 'I am User',
-                    icon: Icons.person,
-                    gradient: AppColors.blueGradient,
-                    onTap: () {
-                      Get.to(() => const UserQrScannerScreen());
-                    },
+                ),
+                const SizedBox(height: 24),
+                // Title
+                Text(
+                  'Parx Hardware',
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFF0F172A),
+                    letterSpacing: -0.5,
                   ),
-                  
-                  const SizedBox(height: 24),
-                  
-                  // I am Dealer Button
-                  _buildTypeButton(
-                    context,
-                    title: 'I am Dealer',
-                    icon: Icons.store,
-                    gradient: AppColors.successGradient,
-                    onTap: () {
-                      Get.to(() => const DealerLoginScreen());
-                    },
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Choose your role to continue',
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: const Color(0xFF64748B),
+                    fontWeight: FontWeight.w500,
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(height: 48),
+                // I am User
+                _buildRoleCard(
+                  context,
+                  title: 'I am User',
+                  subtitle: 'Scan QR codes to explore',
+                  icon: Icons.person_rounded,
+                  accentColor: const Color(0xFF2563EB),
+                  onTap: () => Get.to(() => const UserQrScannerScreen()),
+                ),
+                const SizedBox(height: 16),
+                // I am Partner
+                _buildRoleCard(
+                  context,
+                  title: 'I am Partner',
+                  subtitle: 'Manage your business',
+                  icon: Icons.store_rounded,
+                  accentColor: const Color(0xFF7C3AED),
+                  onTap: () => Get.to(() => const DealerLoginScreen()),
+                ),
+                const SizedBox(height: 32),
+              ],
             ),
           ),
         ),
@@ -71,78 +89,73 @@ class UserTypeSelectionScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTypeButton(
+  Widget _buildRoleCard(
     BuildContext context, {
     required String title,
+    required String subtitle,
     required IconData icon,
-    required Gradient gradient,
+    required Color accentColor,
     required VoidCallback onTap,
   }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return GlassmorphicContainer(
-      height: 120,
-      padding: const EdgeInsets.all(24),
-      borderRadius: BorderRadius.circular(20),
-      gradient: isDark
-          ? LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                AppColors.primaryPurple.withOpacity(0.4),
-                AppColors.primaryBlue.withOpacity(0.35),
-                AppColors.primaryPurple.withOpacity(0.3),
-              ],
-            )
-          : gradient,
-      borderColor: Colors.white.withOpacity(isDark ? 0.3 : 0.5),
-      borderWidth: 2,
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withOpacity(0.3),
-          blurRadius: 20,
-          offset: const Offset(0, 8),
-          spreadRadius: 2,
-        ),
-        BoxShadow(
-          color: Colors.black.withOpacity(0.2),
-          blurRadius: 15,
-          offset: const Offset(0, 4),
-        ),
-      ],
-      onTap: onTap,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              icon,
-              size: 40,
-              color: AppColors.textLight,
-            ),
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(16),
+      elevation: 0,
+      shadowColor: Colors.black26,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
           ),
-          const SizedBox(width: 16),
-          Text(
-            title,
-            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  color: AppColors.textLight,
-                  fontWeight: FontWeight.bold,
-                  shadows: [
-                    Shadow(
-                      color: Colors.black.withOpacity(0.3),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
+          child: Row(
+            children: [
+              Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: accentColor.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(icon, size: 28, color: accentColor),
+              ),
+              const SizedBox(width: 20),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF0F172A),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFF64748B),
+                        fontWeight: FontWeight.w400,
+                      ),
                     ),
                   ],
                 ),
+              ),
+              Icon(
+                Icons.arrow_forward_ios_rounded,
+                size: 16,
+                color: const Color(0xFF94A3B8),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
 }
-

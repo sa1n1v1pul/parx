@@ -1,19 +1,26 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  // Primary Colors - Enhanced 3D Theme
-  static const Color primaryBlue = Color(0xFF6366F1);
+  // Primary Colors - Enhanced 3D Theme with Cool Colors
+  static const Color primaryBlue = Color(0xFF0F73F7); // Cool blue from resort app
   static const Color primaryIndigo = Color(0xFF4F46E5);
   static const Color primaryPurple = Color(0xFF8B5CF6);
   static const Color primaryCyan = Color(0xFF06B6D4);
+  static const Color coolBlue = Color(0xFF3B82F6);
+  static const Color coolBlueLight = Color(0xFF60A5FA);
+  static const Color coolBlueDark = Color(0xFF1E40AF);
+  static const Color coolPurple = Color(0xFF9333EA);
+  static const Color coolCyan = Color(0xFF22D3EE);
 
-  // Gradient Colors - 3D Effect
-  static const Color gradientStart = Color(0xFF667EEA);
-  static const Color gradientEnd = Color(0xFF764BA2);
-  static const Color gradientBlueStart = Color(0xFF4F46E5);
-  static const Color gradientBlueEnd = Color(0xFF818CF8);
+  // Gradient Colors - 3D Effect with Cool Combinations
+  static const Color gradientStart = Color(0xFF0F73F7); // Cool blue start
+  static const Color gradientEnd = Color(0xFF8B5CF6); // Purple end
+  static const Color gradientBlueStart = Color(0xFF0F73F7);
+  static const Color gradientBlueEnd = Color(0xFF3B82F6);
   static const Color gradientPurpleStart = Color(0xFF8B5CF6);
-  static const Color gradientPurpleEnd = Color(0xFFA78BFA);
+  static const Color gradientPurpleEnd = Color(0xFF9333EA);
+  static const Color gradientCyanStart = Color(0xFF06B6D4);
+  static const Color gradientCyanEnd = Color(0xFF22D3EE);
 
   // Accent Colors
   static const Color accentGreen = Color(0xFF10B981);
@@ -48,7 +55,8 @@ class AppColors {
   static LinearGradient get primaryGradient => const LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [gradientStart, gradientEnd],
+    colors: [gradientStart, gradientBlueEnd, gradientPurpleEnd, coolCyan],
+    stops: [0.0, 0.3, 0.7, 1.0],
   );
 
   static LinearGradient get blueGradient => const LinearGradient(
@@ -67,6 +75,24 @@ class AppColors {
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
     colors: [Color(0xFF10B981), Color(0xFF059669)],
+  );
+
+  static LinearGradient get coolBlueGradient => const LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [coolBlue, coolBlueLight, coolCyan],
+  );
+
+  static LinearGradient get coolPurpleGradient => const LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [coolPurple, primaryPurple, coolCyan],
+  );
+
+  static LinearGradient get premiumGradient => const LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [gradientStart, gradientBlueEnd, gradientPurpleEnd],
   );
 
   // 3D Shadow
