@@ -1,4 +1,4 @@
-package com.example.parx
+package com.sarxhardware.app
 
 import android.content.ContentValues
 import android.os.Build
@@ -12,7 +12,7 @@ import java.io.FileInputStream
 import java.io.OutputStream
 
 class MainActivity : FlutterActivity() {
-    private val DOWNLOAD_CHANNEL = "com.example.parx/download"
+    private val DOWNLOAD_CHANNEL = "com.sarxhardware.app/download"
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)

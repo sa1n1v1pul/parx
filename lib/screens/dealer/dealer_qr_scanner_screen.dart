@@ -234,26 +234,22 @@ class _DealerQrScannerScreenState extends State<DealerQrScannerScreen> {
 
     final success = await _qrController.scanQr(qrToken);
 
-    // Restart camera after processing
+    // Restart camera after processing (we stopped it above; always start again)
     if (mounted) {
       try {
-        await Future.delayed(const Duration(milliseconds: 500));
-        // Only restart if not already started
-        if (!_cameraStarted) {
-          await _controller.start();
-          print('[QR_SCANNER] Camera restarted after processing');
-        } else {
-          print('[QR_SCANNER] Camera already running, skipping restart');
+        await Future.delayed(const Duration(milliseconds: 400));
+        await _controller.start();
+        if (mounted) {
+          setState(() {
+            _cameraStarted = true;
+            _hasCameraError = false;
+          });
         }
+        print('[QR_SCANNER] Camera restarted after processing');
       } catch (e) {
         print('[QR_SCANNER] Error restarting camera: $e');
-        // If error is "already started", update flag
-        if (e.toString().contains('already started')) {
-          if (mounted) {
-            setState(() {
-              _cameraStarted = true;
-            });
-          }
+        if (e.toString().contains('already started') && mounted) {
+          setState(() => _cameraStarted = true);
         }
       }
     }
@@ -323,10 +319,7 @@ class _DealerQrScannerScreenState extends State<DealerQrScannerScreen> {
           ),
           actions: [
             TextButton(
-              onPressed: () {
-                Get.back(); // Close dialog
-                Get.back(); // Close scanner screen and go back to home
-              },
+              onPressed: () => Get.back(),
               child: const Text(
                 'OK',
                 style: TextStyle(
@@ -337,7 +330,7 @@ class _DealerQrScannerScreenState extends State<DealerQrScannerScreen> {
             ),
           ],
         ),
-        barrierDismissible: false, // Prevent dismissing by tapping outside
+        barrierDismissible: false,
       );
     }
 

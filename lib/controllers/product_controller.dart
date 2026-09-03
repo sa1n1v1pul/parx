@@ -43,7 +43,10 @@ class ProductController extends GetxController {
       }
       isLoading.value = false;
     } catch (e) {
-      errorMessage.value = 'Error fetching products: ${e.toString()}';
+      errorMessage.value = ApiService.toUserFriendlyError(
+        e,
+        fallback: 'Could not load products right now.',
+      );
       isLoading.value = false;
     }
   }

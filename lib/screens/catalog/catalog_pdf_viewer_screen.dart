@@ -9,6 +9,7 @@ import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../../core/constants/app_constants.dart';
+import '../../core/services/api_service.dart';
 import '../../core/theme/app_colors.dart';
 
 class CatalogPdfViewerScreen extends StatefulWidget {
@@ -23,7 +24,7 @@ class CatalogPdfViewerScreen extends StatefulWidget {
 
 class _CatalogPdfViewerScreenState extends State<CatalogPdfViewerScreen> {
   bool _isDownloading = false;
-  static const _downloadChannel = MethodChannel('com.example.parx/download');
+  static const _downloadChannel = MethodChannel('com.sarxhardware.app/download');
 
   Future<void> _downloadPdf() async {
     if (_isDownloading) return;
@@ -94,7 +95,10 @@ class _CatalogPdfViewerScreenState extends State<CatalogPdfViewerScreen> {
         setState(() => _isDownloading = false);
         Get.snackbar(
           'Error',
-          'Download failed: $e',
+          ApiService.toUserFriendlyError(
+            e,
+            fallback: 'Download failed. Please try again.',
+          ),
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: AppColors.error,
         );

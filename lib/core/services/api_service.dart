@@ -138,4 +138,48 @@ class ApiService {
       // Ignore errors
     }
   }
+
+  static String toUserFriendlyError(
+    Object error, {
+    String fallback = 'Something went wrong. Please try again.',
+  }) {
+    if (error is DioException) {
+      final statusCode = error.response?.statusCode ?? 0;
+      final data = error.response?.data;
+
+      if (data is Map) {
+        final message = data['message']?.toString();
+        final errorText = data['error']?.toString();
+        if (message != null && message.trim().isNotEmpty) return message.trim();
+        if (errorText != null && errorText.trim().isNotEmpty) {
+          return errorText.trim();
+        }
+      }
+
+      switch (statusCode) {
+        case 400:
+          return 'Invalid request. Please check your details and try again.';
+        case 401:
+          return 'Session expired. Please login again.';
+        case 403:
+          return 'You are not authorized to perform this action.';
+        case 404:
+          return 'Requested data was not found.';
+        case 422:
+          return 'The entered details are invalid. Please verify and retry.';
+        case 500:
+          return 'Server error. Please try again in a moment.';
+      }
+
+      if (error.type == DioExceptionType.connectionTimeout ||
+          error.type == DioExceptionType.receiveTimeout ||
+          error.type == DioExceptionType.sendTimeout) {
+        return 'Request timed out. Please check your internet connection.';
+      }
+      if (error.type == DioExceptionType.connectionError) {
+        return 'No internet connection. Please try again.';
+      }
+    }
+    return fallback;
+  }
 }

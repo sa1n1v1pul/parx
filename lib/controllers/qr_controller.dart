@@ -37,11 +37,12 @@ class QrController extends GetxController {
 
       if (response.statusCode == 200) {
         final data = response.data;
-        if (data['success'] == true) {
+        if (data is Map && data['success'] == true) {
           print('[QR_CONTROLLER] Scan successful');
-          scanResult.value = data['data'];
-          
-          // Refresh wallet after successful scan
+          // API may return wallet_balance at root and/or nested under data
+          scanResult.value = _normalizeScanSuccess(data);
+
+          // Refresh wallet after successful scan (sync with server)
           try {
             final walletController = Get.find<WalletController>();
             await walletController.fetchWallet();
@@ -49,7 +50,7 @@ class QrController extends GetxController {
           } catch (e) {
             print('[QR_CONTROLLER] Error refreshing wallet: $e');
           }
-          
+
           isLoading.value = false;
           return true;
         } else {
@@ -86,42 +87,48 @@ class QrController extends GetxController {
         }
       }
       
+      final statusCode = e.response?.statusCode ?? 0;
+
       // If no message from response, use status code based messages
       if (userFriendlyMessage == 'Failed to scan QR code' || userFriendlyMessage.isEmpty) {
-        final statusCode = e.response?.statusCode ?? 0;
-        
         switch (statusCode) {
           case 400:
-            userFriendlyMessage = 'This QR code is not valid for you or has already been used. Please scan a valid QR code.';
+            // Warranty not activated by customer yet (customer must scan first)
+            userFriendlyMessage =
+                'Warranty is not activated yet. Ask the customer to scan their product QR first to start the warranty. Then you can scan the same QR to claim your reward.';
+            break;
+          case 403:
+            // QR exclusively assigned to another dealer/partner
+            userFriendlyMessage =
+                'This QR code is assigned to another partner. You cannot claim a reward on it.';
             break;
           case 404:
             userFriendlyMessage = 'QR code not found. Please scan a valid QR code.';
-            break;
-          case 403:
-            userFriendlyMessage = 'You are not authorized to scan this QR code.';
             break;
           case 401:
             userFriendlyMessage = 'Session expired. Please login again.';
             break;
           default:
-            if (e.type == DioExceptionType.connectionTimeout || 
+            if (e.type == DioExceptionType.connectionTimeout ||
                 e.type == DioExceptionType.receiveTimeout) {
               userFriendlyMessage = 'Connection timeout. Please check your internet connection.';
             } else if (e.type == DioExceptionType.connectionError) {
               userFriendlyMessage = 'Network error. Please check your internet connection.';
             } else {
-              userFriendlyMessage = 'This QR code is not valid or has already been used.';
+              userFriendlyMessage = 'Could not claim reward. Please try again.';
             }
         }
       }
-      
-      // Make message more user-friendly
-      if (userFriendlyMessage.toLowerCase().contains('already') || 
-          userFriendlyMessage.toLowerCase().contains('used')) {
-        userFriendlyMessage = 'This QR code has already been used. Please scan a new QR code.';
-      } else if (userFriendlyMessage.toLowerCase().contains('invalid') || 
-                 userFriendlyMessage.toLowerCase().contains('not valid')) {
-        userFriendlyMessage = 'This QR code is not valid for you. Please scan a valid QR code.';
+
+      // Only soften generic messages; do not override clear 400/403 API text
+      if (statusCode != 400 && statusCode != 403) {
+        if (userFriendlyMessage.toLowerCase().contains('already') ||
+            userFriendlyMessage.toLowerCase().contains('used')) {
+          userFriendlyMessage = 'This QR code has already been used. Please scan a new QR code.';
+        } else if (userFriendlyMessage.toLowerCase().contains('invalid') ||
+            userFriendlyMessage.toLowerCase().contains('not valid')) {
+          userFriendlyMessage = 'This QR code is not valid for you. Please scan a valid QR code.';
+        }
       }
       
       errorMessage.value = userFriendlyMessage;
@@ -139,5 +146,20 @@ class QrController extends GetxController {
   void clearResult() {
     scanResult.value = null;
     errorMessage.value = '';
+  }
+
+  /// Builds one map for UI: nested `data` + root `wallet_balance` if API sends it there.
+  Map<String, dynamic> _normalizeScanSuccess(Map<dynamic, dynamic> raw) {
+    final out = <String, dynamic>{};
+    final inner = raw['data'];
+    if (inner is Map) {
+      inner.forEach((k, v) {
+        out[k.toString()] = v;
+      });
+    }
+    if (raw['wallet_balance'] != null) {
+      out['wallet_balance'] = raw['wallet_balance'];
+    }
+    return out;
   }
 }

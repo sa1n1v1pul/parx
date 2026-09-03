@@ -43,7 +43,10 @@ class ProfileController extends GetxController {
       }
       isLoading.value = false;
     } catch (e) {
-      errorMessage.value = 'Error fetching profile: ${e.toString()}';
+      errorMessage.value = ApiService.toUserFriendlyError(
+        e,
+        fallback: 'Could not load profile right now.',
+      );
       isLoading.value = false;
     }
   }
@@ -58,8 +61,8 @@ class ProfileController extends GetxController {
       if (image != null) {
         selectedImage.value = File(image.path);
       }
-    } catch (e) {
-      errorMessage.value = 'Error picking image: ${e.toString()}';
+    } catch (_) {
+      errorMessage.value = 'Could not pick image. Please try again.';
     }
   }
 
@@ -134,7 +137,10 @@ class ProfileController extends GetxController {
         return false;
       }
     } catch (e) {
-      errorMessage.value = 'Error: ${e.toString()}';
+      errorMessage.value = ApiService.toUserFriendlyError(
+        e,
+        fallback: 'Profile update failed. Please try again.',
+      );
       isLoading.value = false;
       return false;
     }

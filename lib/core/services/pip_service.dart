@@ -2,7 +2,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart';
 
 class PipService {
-  static const MethodChannel _channel = MethodChannel('com.example.parx/pip');
+  static const MethodChannel _channel = MethodChannel('com.sarxhardware.app/pip');
   static Function(bool)? _onPipModeChanged;
   static bool _isInitialized = false;
 

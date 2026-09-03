@@ -39,7 +39,10 @@ class WithdrawalController extends GetxController {
         return false;
       }
     } catch (e) {
-      errorMessage.value = 'Error: ${e.toString()}';
+      errorMessage.value = ApiService.toUserFriendlyError(
+        e,
+        fallback: 'Could not submit withdrawal request.',
+      );
       isLoading.value = false;
       return false;
     }
@@ -96,7 +99,10 @@ class WithdrawalController extends GetxController {
     } catch (e, stackTrace) {
       print('[WITHDRAWAL_CONTROLLER] Error fetching requests: $e');
       print('[WITHDRAWAL_CONTROLLER] Stack trace: $stackTrace');
-      errorMessage.value = 'Error fetching requests: ${e.toString()}';
+      errorMessage.value = ApiService.toUserFriendlyError(
+        e,
+        fallback: 'Could not load withdrawal history.',
+      );
       isLoading.value = false;
     }
   }

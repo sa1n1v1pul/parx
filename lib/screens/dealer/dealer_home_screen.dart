@@ -4,6 +4,8 @@ import '../../controllers/auth_controller.dart';
 import '../../controllers/wallet_controller.dart';
 import '../../controllers/product_controller.dart';
 import '../../controllers/theme_controller.dart';
+import '../../controllers/partner_offer_controller.dart';
+import '../../core/constants/app_constants.dart';
 import '../../core/theme/app_colors.dart';
 import '../../widgets/custom_bottom_nav_bar.dart';
 import '../../widgets/empty_state_widget.dart';
@@ -14,6 +16,7 @@ import '../withdrawal/withdrawal_screen.dart';
 import '../catalog/catalogs_view_all_screen.dart';
 import '../catalog/catalog_detail_screen.dart';
 import '../../controllers/catalog_controller.dart';
+import 'partner_offers_screen.dart';
 
 class DealerHomeScreen extends StatefulWidget {
   const DealerHomeScreen({super.key});
@@ -26,6 +29,9 @@ class _DealerHomeScreenState extends State<DealerHomeScreen> {
   int _currentIndex = 0;
   final WalletController _walletController = Get.put(WalletController());
   final ProductController _productController = Get.put(ProductController());
+  final PartnerOfferController _partnerOfferController = Get.put(
+    PartnerOfferController(),
+  );
 
   @override
   void initState() {
@@ -33,6 +39,7 @@ class _DealerHomeScreenState extends State<DealerHomeScreen> {
     _walletController.fetchWallet();
     _productController.fetchProducts();
     Get.put(CatalogController()).fetchCatalogs();
+    _partnerOfferController.fetchPartnerOffers();
   }
 
   @override
@@ -76,7 +83,7 @@ class HomeTab extends StatelessWidget {
           ? null
           : const Color(0xFFF8FAFC),
       appBar: AppBar(
-        title: const Text('Parx Hardware'),
+        title: const Text(AppConstants.appName),
         backgroundColor: Theme.of(context).brightness == Brightness.dark
             ? null
             : const Color(0xFFF8FAFC),
@@ -98,6 +105,7 @@ class HomeTab extends StatelessWidget {
             walletController.refreshWallet();
             productController.refreshProducts();
             Get.find<CatalogController>().refreshCatalogs();
+            Get.find<PartnerOfferController>().fetchPartnerOffers(refresh: true);
           },
           child: Builder(
             builder: (context) {
@@ -206,6 +214,17 @@ class HomeTab extends StatelessWidget {
                         ],
                       ),
                     ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: _buildQuickActionCard(
+                        context,
+                        icon: Icons.local_offer_outlined,
+                        title: 'Partner Offers',
+                        color: AppColors.primaryBlue,
+                        onTap: () => Get.to(() => const PartnerOffersScreen()),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
 
                     // Catalogs section (for partner)
                     Padding(

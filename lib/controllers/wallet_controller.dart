@@ -44,7 +44,10 @@ class WalletController extends GetxController {
     } catch (e, stackTrace) {
       print('[WALLET_CONTROLLER] Error fetching wallet: $e');
       print('[WALLET_CONTROLLER] Stack trace: $stackTrace');
-      errorMessage.value = 'Error fetching wallet: ${e.toString()}';
+      errorMessage.value = ApiService.toUserFriendlyError(
+        e,
+        fallback: 'Could not load wallet right now.',
+      );
       isLoading.value = false;
     }
   }
@@ -80,7 +83,10 @@ class WalletController extends GetxController {
       }
       isLoading.value = false;
     } catch (e) {
-      errorMessage.value = 'Error fetching history: ${e.toString()}';
+      errorMessage.value = ApiService.toUserFriendlyError(
+        e,
+        fallback: 'Could not load wallet history.',
+      );
       isLoading.value = false;
     }
   }

@@ -69,7 +69,10 @@ class AuthController extends GetxController {
         return false;
       }
     } catch (e) {
-      errorMessage.value = 'Error: ${e.toString()}';
+      errorMessage.value = ApiService.toUserFriendlyError(
+        e,
+        fallback: 'Login failed. Please check mobile number and password.',
+      );
       isLoading.value = false;
       return false;
     }

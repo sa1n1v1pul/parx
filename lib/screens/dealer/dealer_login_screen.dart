@@ -78,21 +78,11 @@ class _DealerLoginScreenState extends State<DealerLoginScreen> {
                   const SizedBox(height: 16),
                   // Logo
                   Center(
-                    child: Container(
-                      width: 72,
+                    child: Image.asset(
+                      'assets/images/parx_logo.jpeg',
                       height: 72,
-                      decoration: BoxDecoration(
-                        color: _primary,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: _primary.withValues(alpha: 0.3),
-                            blurRadius: 16,
-                            offset: const Offset(0, 6),
-                          ),
-                        ],
-                      ),
-                      child: const Icon(Icons.store_rounded, size: 36, color: Colors.white),
+                      fit: BoxFit.contain,
+                      errorBuilder: (_, __, ___) => const Icon(Icons.store_rounded, size: 36, color: _primary),
                     ),
                   ),
                   const SizedBox(height: 24),
@@ -117,12 +107,13 @@ class _DealerLoginScreenState extends State<DealerLoginScreen> {
                     ),
                   ),
                   const SizedBox(height: 40),
-                  // Mobile / Username
+                  // Mobile Number
                   TextFormField(
                     controller: _loginController,
                     style: const TextStyle(fontSize: 16, color: _textPrimary, fontWeight: FontWeight.w500),
                     decoration: InputDecoration(
-                      labelText: 'Mobile / Username',
+                      labelText: 'Mobile Number',
+                      hintText: 'Enter mobile number',
                       labelStyle: const TextStyle(color: _textSecondary, fontWeight: FontWeight.w400),
                       prefixIcon: const Icon(Icons.person_outline_rounded, color: _textSecondary, size: 22),
                       filled: true,
@@ -145,10 +136,13 @@ class _DealerLoginScreenState extends State<DealerLoginScreen> {
                       ),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                     ),
-                    keyboardType: TextInputType.text,
+                    keyboardType: TextInputType.phone,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter mobile or username';
+                        return 'Please enter mobile number';
+                      }
+                      if (!RegExp(r'^[0-9]{10}$').hasMatch(value.trim())) {
+                        return 'Enter a valid 10-digit mobile number';
                       }
                       return null;
                     },

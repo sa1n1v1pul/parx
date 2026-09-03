@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../core/theme/app_colors.dart';
 import 'dealer/dealer_login_screen.dart';
 import 'user/user_qr_scanner_screen.dart';
 
@@ -20,30 +19,17 @@ class UserTypeSelectionScreen extends StatelessWidget {
               children: [
                 const SizedBox(height: 24),
                 // Logo
-                Container(
-                  width: 88,
+                Image.asset(
+                  'assets/images/parx_logo.jpeg',
                   height: 88,
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryBlue,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primaryBlue.withValues(alpha: 0.35),
-                        blurRadius: 20,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
-                  ),
-                  child: const Icon(
-                    Icons.storefront_rounded,
-                    size: 44,
-                    color: Colors.white,
-                  ),
+                  fit: BoxFit.contain,
+                  errorBuilder: (_, __, ___) =>
+                      const Icon(Icons.storefront_rounded, size: 44),
                 ),
                 const SizedBox(height: 24),
                 // Title
                 Text(
-                  'Parx Hardware',
+                  'Sarx Hardware',
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.w700,

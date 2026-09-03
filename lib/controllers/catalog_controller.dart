@@ -28,7 +28,10 @@ class CatalogController extends GetxController {
       }
       isLoading.value = false;
     } catch (e) {
-      errorMessage.value = 'Error fetching catalogs: ${e.toString()}';
+      errorMessage.value = ApiService.toUserFriendlyError(
+        e,
+        fallback: 'Could not load catalogs right now.',
+      );
       isLoading.value = false;
     }
   }
